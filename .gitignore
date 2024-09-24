@@ -1,5 +1,6 @@
 .ipynb_checkpoints/
 *.csv
+*.DS_Store
 *.pyc
 introduction-to-python/*.txt
 introduction-to-python/*.json
