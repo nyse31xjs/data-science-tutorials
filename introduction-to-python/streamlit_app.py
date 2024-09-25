@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import time
+import numpy as np
+import plotly.graph_objects as go
+from scipy.stats import norm
 
 # Title of the app
 st.title("Gaussian Vectors")
@@ -99,3 +102,52 @@ st.button("Styled Button")
 #1. create a function that generates a gaussian vector
 def gaussian_vector(n, mu, sigma):
     return np.random.multivariate_normal(mu, sigma, n)
+
+
+
+####################################################
+
+# Streamlit Inputs for Univariate Gaussian parameters
+st.title('Univariate Gaussian Sample Generator with Empirical and Theoretical Density')
+
+# Input number of samples (n)
+n_samples = st.number_input('Number of samples (n)', value=100)
+
+# Input mean (mu) and variance (sigma^2)
+mean = st.number_input('Mean (μ)', value=0.0)
+variance = st.number_input('Variance (σ²)', value=1.0)
+std_dev = np.sqrt(variance)  # Standard deviation
+
+# Step 2: Generate the Univariate Gaussian samples
+samples = np.random.normal(loc=mean, scale=std_dev, size=n_samples)
+
+# Step 3: Create bins for histogram and calculate the theoretical density curve
+x_vals = np.linspace(np.min(samples) - 1, np.max(samples) + 1, 1000)
+theoretical_density = norm.pdf(x_vals, mean, std_dev)
+
+# Step 4: Plot the histogram (empirical density) and overlay the theoretical density curve
+fig = go.Figure()
+
+# Histogram of the samples (empirical density)
+fig.add_trace(go.Histogram(x=samples, nbinsx=50, histnorm='probability density', 
+                           name='Empirical Density', marker_color='blue', opacity=0.6))
+
+# Theoretical density curve
+fig.add_trace(go.Scatter(x=x_vals, y=theoretical_density, mode='lines', 
+                         name='Theoretical Density', line=dict(color='red', width=2)))
+
+# Update layout for better visibility
+fig.update_layout(
+    title="Univariate Gaussian Distribution: Empirical vs Theoretical Density",
+    xaxis_title="X",
+    yaxis_title="Density",
+    showlegend=True,
+    autosize=False,
+    width=800, height=500
+)
+
+# Step 5: Display the plot in Streamlit
+st.plotly_chart(fig)
+
+# Display additional information
+st.write(f"Generated {n_samples} samples from a Univariate Gaussian distribution with mean {mean} and variance {variance} (σ = {std_dev:.2f}).")
